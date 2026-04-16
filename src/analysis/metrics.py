@@ -1,4 +1,4 @@
-"""Metric computation for Phase 1 experiments."""
+"""Metric computation helpers for experiment analysis."""
 
 from __future__ import annotations
 
@@ -29,4 +29,3 @@ def negative_reward_ratio(rewards: np.ndarray) -> float:
     if len(rewards) == 0:
         return 0.0
     return float(np.mean(np.asarray(rewards) < 0.0))
-

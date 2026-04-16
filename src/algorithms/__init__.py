@@ -1,6 +1,15 @@
-"""GRPO training utilities."""
+"""GRPO algorithm utilities."""
 
-from .grpo_trainer import GRPOTrainer
+from .reward_shaping import (
+    compute_advantages,
+    compute_discounted_returns,
+    normalize_group_returns,
+    select_reward_track,
+)
 
-__all__ = ["GRPOTrainer"]
-
+__all__ = [
+    "compute_advantages",
+    "compute_discounted_returns",
+    "normalize_group_returns",
+    "select_reward_track",
+]

@@ -1,4 +1,4 @@
-"""Simple statistical tests used for Phase 1 reporting."""
+"""Simple statistical tests used for experiment reporting."""
 
 from __future__ import annotations
 

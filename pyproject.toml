@@ -1,7 +1,7 @@
 [project]
 name = "vla-driven-manipulation"
 version = "0.1.0"
-description = "Phase 1 GRPO reward validation on classic RL benchmarks."
+description = "Reward-driven GRPO research utilities for VLA manipulation."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

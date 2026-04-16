@@ -1,4 +1,4 @@
-"""Plot generation for single runs and aggregated Phase 1 comparisons."""
+"""Plot generation for single runs and aggregated experiment comparisons."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-_cache_root = Path(tempfile.gettempdir()) / "vla_phase1_matplotlib"
+_cache_root = Path(tempfile.gettempdir()) / "vla_experiment_matplotlib"
 _cache_root.mkdir(parents=True, exist_ok=True)
 os.environ.setdefault("MPLCONFIGDIR", str(_cache_root / "mplconfig"))
 os.environ.setdefault("XDG_CACHE_HOME", str(_cache_root / "xdg-cache"))
@@ -69,7 +69,7 @@ def save_run_plots(results_dir: str | Path) -> list[Path]:
     return [output_path]
 
 
-def save_phase_comparison_plot(aggregate_df: pd.DataFrame, output_dir: str | Path) -> list[Path]:
+def save_comparison_plots(aggregate_df: pd.DataFrame, output_dir: str | Path) -> list[Path]:
     """Create mean-by-condition comparison plots for a matrix of runs."""
 
     target_dir = Path(output_dir)

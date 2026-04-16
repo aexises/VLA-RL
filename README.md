@@ -102,27 +102,16 @@ Full derivation in `hypothesis.md` Eqs. (1)–(5).
 
 ## 5. Experimental Plan
 
-### Phase 1: Classic RL Environments (MANDATORY FIRST STEP)
-
-Before VLA tasks, validate all three reward types on simple benchmarks. Each environment supports all three reward types (Binary, Dense, Clipped Dense) for direct comparison:
-
-- **CartPole-v1** — Binary: survival 0/1; Dense: angle + position penalties; Clipped Dense
-- **MountainCar-v0** — Binary: reach flag 0/1; Dense: distance to goal + velocity; Clipped Dense
-- **Acrobot-v1** — Binary: reach height 0/1; Dense: height progress + angle; Clipped Dense
-- **HalfCheetah-v4 / Ant-v4** — Binary: velocity threshold 0/1; Dense: velocity + smoothness; Clipped Dense
-
-**Success criteria:**
-- Dense reward shows ≥15% improvement in sample efficiency over binary
-- Clipped dense demonstrates either: (a) faster convergence than dense, or (b) comparable final performance with lower gradient variance
-- Results statistically significant (p < 0.05, ≥5 seeds)
-
-### Phase 2: VLA Manipulation Tasks
-
-Only after Phase 1 success:
+Evaluate the three reward types on VLA manipulation tasks:
 - LIBERO suite (Spatial, Object, Goal, Long)
 - RoboTwin tasks
 - CALVIN benchmark tasks
-- **SFT only** baseline (supervised fine-tuning without RL) will also be included for VLA tasks
+- **SFT only** baseline (supervised fine-tuning without RL)
+
+**Success criteria:**
+- Dense reward shows practically meaningful sample-efficiency improvement over binary reward
+- Clipped dense demonstrates either faster convergence than dense or comparable final performance with lower gradient variance
+- Results statistically significant (p < 0.05, ≥5 seeds)
 
 ---
 
@@ -157,4 +146,4 @@ This project systematically compares **three** GRPO reward formulations:
 | 2 | Dense | ReinboT (Zhang et al., 2025) |
 | 3 | Clipped Dense | This project — clipping threshold determined experimentally |
 
-Validation proceeds in two phases: classic RL environments first, then VLA manipulation tasks. Full mathematical formulation and algorithm pseudocode are documented in `hypothesis.md`. Agent instructions live in `agents.md`.
+Validation compares binary, dense, and clipped-dense reward formulations on VLA manipulation tasks. Full mathematical formulation and algorithm pseudocode are documented in `hypothesis.md`. Agent instructions live in `agents.md`.

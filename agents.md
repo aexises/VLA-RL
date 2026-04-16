@@ -46,45 +46,25 @@ All work on this project MUST follow this protocol:
 - **Control variables:** Keep hyperparameters, environment, model architecture, and random seeds identical across conditions
 - **Multiple runs:** Minimum 5 seeds per condition for statistical significance
 
-### 3. Phased Experimental Approach
+### 3. Experimental Scope
 
-#### Phase 1: Validation on Classic RL Environments (MANDATORY FIRST STEP)
-**Before any VLA-specific experiments, all three reward types MUST be validated on simple, well-understood RL benchmarks.**
-
-Purpose:
-- Prove effectiveness of dense and clipped-dense rewards in a controlled, reproducible setting
-- Establish baseline behavior without the complexity of vision-language-action inputs
-- Debug algorithm implementation before scaling to VLA tasks
-
-**CRITICAL REQUIREMENT:** Each Phase 1 environment MUST support ALL THREE reward types (Binary, Dense, Clipped Dense) with clearly defined reward functions.
-
-#### Phase 1 Environments and Reward Definitions
-
-| Environment | Binary Reward | Dense Reward | Clipped Dense |
-|-------------|---------------|--------------|---------------|
-| **CartPole-v1** | +1 if pole upright (|θ| < 12°), 0 otherwise (episode end) | $r_t = +1$ per step alive + $w_1(-\|θ_t\|)$ (angle penalty) + $w_2(-\|x_t\|)$ (cart position penalty) | Same dense, clipped at $\tau_{\rm clip}$ |
-| **MountainCar-v0** | +1 if flag reached (x ≥ 0.5), 0 otherwise (episode end) | $r_t = -(0.5 - x_t)$ (distance to goal) + $w_1 \cdot v_t$ (velocity progress) | Same dense, clipped at $\tau_{\rm clip}$ |
-| **Acrobot-v1** | +1 if tip reaches target height, 0 otherwise (episode end) | $r_t = -(y_{\rm target} - y_{\rm tip})$ (height progress) + $w_1(-\|θ_t - θ_{\rm target}\|)$ (angle-to-goal) | Same dense, clipped at $\tau_{\rm clip}$ |
-| **HalfCheetah-v4** | +1 if forward velocity ≥ threshold, 0 otherwise (episode end) | $r_t = v_t$ (forward velocity) + $w_1(-\|a_t - a_{t-1}\|^2)$ (action smoothness) | Same dense, clipped at $\tau_{\rm clip}$ |
-| **Ant-v4** | +1 if forward velocity ≥ threshold, 0 otherwise (episode end) | $r_t = v_t$ (forward velocity) + $w_1(-\|a_t - a_{t-1}\|^2)$ (smoothness) + $w_2(-\|\text{z-coordinate deviation}\|)$ (stability) | Same dense, clipped at $\tau_{\rm clip}$ |
-
-**Notes:**
-- Binary reward is always terminal-only (0/1 based on task completion or threshold achievement)
-- Dense reward uses ReinboT-style decomposition: progress + smoothness + terminal
-- Clipped dense uses same dense formula with $r^{\rm clipped}_t = \max(r_t, \tau_{\rm clip})$, threshold determined experimentally.
-- Component weights $w_i$ should be tuned so that magnitudes are comparable across environments
-
-Success criteria for Phase 1:
-- Dense reward shows ≥15% improvement in sample efficiency over sparse (measured in episodes to target reward)
-- Clipped dense reward demonstrates either: (a) faster convergence than full dense, or (b) comparable final performance with lower gradient variance
-- Results are statistically significant (p < 0.05, ≥5 seeds)
-
-#### Phase 2: VLA Manipulation Tasks
-Only after Phase 1 success criteria are met:
+Evaluate the three reward types on VLA manipulation tasks:
 - LIBERO suite (Spatial, Object, Goal, Long)
 - RoboTwin tasks
 - CALVIN benchmark tasks
-- **SFT only** baseline (supervised fine-tuning without RL) is included for VLA tasks
+- **SFT only** baseline (supervised fine-tuning without RL)
+
+Requirements:
+- All three reward types MUST be compared under identical conditions
+- Binary reward is terminal-only (0/1 based on task completion)
+- Dense reward uses ReinboT-style decomposition: progress + smoothness + terminal
+- Clipped dense uses $r^{\rm clipped}_t = \max(r_t, \tau_{\rm clip})$
+- Component weights $w_i$ should be tuned so that magnitudes are comparable across tasks
+
+Success criteria:
+- Dense reward shows practically meaningful sample-efficiency improvement over sparse reward
+- Clipped dense reward demonstrates either faster convergence than full dense or comparable final performance with lower gradient variance
+- Results are statistically significant (p < 0.05, ≥5 seeds)
 
 ### 4. Metric Definitions
 Track the following metrics for every experiment:
@@ -104,7 +84,7 @@ The core experiment compares exactly three reward types. Additional ablations:
 - **Discounted advantage:** With vs without γ-discount in the advantage sum (for all three reward types).
 - **Dense reward components:** Toggle individual components from ReinboT Eq. (8): $w_1$ (sub-goal), $w_2$ (progress), $w_3$ (smoothness), $w_4$ (terminal). Test which components contribute most.
 - **Group normalization:** With vs without (for Dense and Clipped Dense only; Binary uses standard GRPO normalization).
-- **SFT only:** For Phase 2 (VLA tasks) only, include supervised fine-tuning baseline without RL.
+- **SFT only:** Include supervised fine-tuning baseline without RL.
 
 ### 6. Validation Criteria
 A result is considered **significant** only if:
@@ -123,7 +103,6 @@ A result is considered **significant** only if:
 ├── agents.md                      # This file
 └── src/                           # (To be created)
     ├── envs/
-    │   ├── classic/               # Classic RL environments (CartPole, MountainCar, etc.)
     │   └── vla/                   # VLA manipulation environments (LIBERO, RoboTwin, etc.)
     ├── models/                    # VLA policy models
     ├── algorithms/
@@ -133,8 +112,6 @@ A result is considered **significant** only if:
     │   └── reward_shaping.py      # Dense reward component functions (ReinboT Eq. 8)
     ├── experiments/
     │   ├── run_experiment.py      # Main experiment runner
-    │   ├── phase1_classic.py      # Phase 1: Classic RL environment experiments
-    │   ├── phase2_vla.py          # Phase 2: VLA manipulation experiments
     │   └── configs/               # YAML configs for each experiment
     └── analysis/
         ├── metrics.py             # Metric computation
@@ -143,10 +120,7 @@ A result is considered **significant** only if:
 
 ### Local and Cloud Data Storage Requirements
 
-**ALL experiment data MUST be stored locally for Phase 1.** For Phase 2+, data MUST be uploaded to cloud storage (local copies are optional but recommended):
-
-- **Phase 1 (classic RL):** Local storage only. Cloud upload optional.
-- **Phase 2+ (VLA tasks):** Cloud storage required (e.g., OpenML, HuggingFace Hub, S3). Local copies are optional but recommended for debugging and quick access.
+Experiment data should be stored locally during development, and production experiment outputs should be uploaded to cloud storage (e.g. OpenML, HuggingFace Hub, S3). Local copies are recommended for debugging and quick access.
 
 #### Required Logging Infrastructure
 
@@ -222,7 +196,7 @@ writer.close()
 - DO NOT delete experiment logs or results without explicit user approval
 - Old runs may be compressed (`tar -czf`) but must remain accessible
 - Maintain a `results/EXPERIMENTS.md` index listing all completed experiments with links to their logs
-- **Phase 2+ cloud upload:** After each VLA experiment, upload `config.yaml`, `metrics.csv`, `summary.json` to the designated cloud repository. Upload must include metadata: experiment name, phase, reward type, seed, git hash, and timestamp. Verify upload by downloading and comparing checksums.
+- **Cloud upload:** After each VLA experiment, upload `config.yaml`, `metrics.csv`, `summary.json` to the designated cloud repository. Upload must include metadata: experiment name, reward type, seed, git hash, and timestamp. Verify upload by downloading and comparing checksums.
 
 ### Implementation Guidelines
 
@@ -312,14 +286,13 @@ Before committing any work:
 - [ ] Results are logged with seed, config, and raw metrics
 - [ ] TensorBoard logs written to `runs/{experiment_name}/{run_id}/`
 - [ ] CSV/JSON results written to `results/{experiment_name}/`
-- [ ] Phase 2+ results uploaded to cloud (OpenML / HF Hub / S3) with checksum verification
+- [ ] Results uploaded to cloud (OpenML / HF Hub / S3) with checksum verification
 - [ ] Required scalars logged (reward, loss, metrics, grad stats, hparams)
 - [ ] Git commit hash and dependency versions recorded in config
 - [ ] Code is reproducible: `python run_experiment.py --config=config.yaml` produces identical results
 - [ ] No hardcoded hyperparameters; all configs in YAML/JSON
 - [ ] Clipping threshold τ_clip is explicitly documented for Clipped Dense experiments
 - [ ] Policy invariance NOT assumed for Dense reward (ReinboT weighted sum ≠ PBRS)
-- [ ] Phase 1 (classic RL) experiments completed and validated BEFORE Phase 2 (VLA)
 - [ ] Negative reward ratio metric tracked for Clipped Dense analysis
 - [ ] `results/EXPERIMENTS.md` index updated with new experiment entry
 
@@ -336,5 +309,4 @@ Before committing any work:
 | Group normalization | `hypothesis.md` Eqs. (1)–(3) |
 | GRPO objective & gradient | `hypothesis.md` Eqs. (4)–(5); Shao et al., 2024 |
 | Discounted advantage variant | `hypothesis.md` (advantage with γ-discount option) |
-| Phase 1 classic RL validation | agents.md "Phased Experimental Approach" (this file) |
-| SFT baseline (Phase 2) | agents.md (this file) |
+| SFT baseline | agents.md (this file) |

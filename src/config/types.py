@@ -24,6 +24,7 @@ class RewardConfig:
     """Reward shaping configuration."""
 
     reward_type: RewardType = "binary"
+    reward_profile: str = "baseline"
     weights: RewardWeights = field(default_factory=RewardWeights)
     tau_clip: float = 0.0
     clip_candidates: list[float] = field(default_factory=lambda: [0.0, 0.1, 0.2, 0.5])
@@ -36,7 +37,6 @@ class EnvConfig:
     """Environment-specific configuration."""
 
     name: str
-    phase: str
     seed: int = 11
     max_episode_steps: int | None = None
     hidden_sizes: list[int] = field(default_factory=lambda: [128, 128])
@@ -64,7 +64,7 @@ class LoggingConfig:
     """Filesystem and logging behavior."""
 
     experiment_name: str
-    run_id: str = "phase1"
+    run_id: str = "run"
     runs_dir: str = "runs"
     results_dir: str = "results"
     write_raw_trajectories: bool = False
@@ -114,4 +114,3 @@ class ExperimentConfig:
                 "hypothesis.md#Формулировка-тестируемой-гипотезы",
             ),
         )
-

@@ -1,2 +1,1 @@
-"""Phase 1 reward validation framework for GRPO on classic RL tasks."""
-
+"""Core utilities for reward-driven GRPO experimentation."""
