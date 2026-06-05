@@ -1,0 +1,6 @@
+dense_reward_training.txt
+terminal_reward_training.txt
+training_log_analysis.ipynb
+report.md
+analysis_outputs/
+.DS_Store
