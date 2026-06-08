@@ -1,6 +1,11 @@
 dense_reward_training.txt
 terminal_reward_training.txt
+dense_grad_norm_05_training.txt
+sparse_reward_train.txt
 training_log_analysis.ipynb
+training_log_analysis_2.ipynb
 report.md
+report_2.md
+comparison_report_2.md
 analysis_outputs/
 .DS_Store
